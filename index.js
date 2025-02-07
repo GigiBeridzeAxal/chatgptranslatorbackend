@@ -4,10 +4,10 @@ const dotenv = require('dotenv')
 const cors = require('cors')
 const ConnectDB = require('./modules/ConnectDB')
 dotenv.config()
-app.use(express.json())
 app.use(cors({
- origin:'*'
-}))
+    origin:'*'
+   }))
+app.use(express.json())
 ConnectDB()
 
 app.use('/' , require('./routes/UserRoute'))

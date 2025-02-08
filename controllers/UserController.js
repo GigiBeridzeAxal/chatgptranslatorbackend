@@ -21,7 +21,7 @@ const Register = async(req,res) => {
         const createnewuser = await UserModel.create({email , firstname , lastname , password})
 
         if(createnewuser){
-            const token = await jwt.sign({firstname , email , lastname} , process.env.SECRETKEY)
+            const token = await jwt.sign({firstname , email , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
             res.status(200).send(token)
         }else{
             res.status(201).send("Something Went Wrong Please Try Again")
@@ -51,7 +51,7 @@ const login = async(req,res) => {
                 const email = findifuserexist[0].email
                 const firstname = findifuserexist[0].firstname
                 const lastname = findifuserexist[0].lastname
-                const token = jwt.sign({email , firstname , lastname} , process.env.SECRETKEY , {expiresIn:'1m'})
+                const token = jwt.sign({email , firstname , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
                 res.status(200).send(token)
             }else{
                 res.status(204).send("Password Didnt Match")
@@ -85,6 +85,36 @@ const usercompleatedprofile = async(req,res) => {
             res.status(204).send("User Not Defined")   
         }
 
+    }
+
+}
+
+const gettopuser = async(req,res) => {
+    
+
+        const find = await UserModel.find()
+
+        res.status(200).send(find)
+
+        
+
+}
+
+const getuserinfo =  async(req,res) => {
+
+
+    const {email} = req.body
+
+    if(!email){
+        res.status(203).send("Email Not Defined")
+    }else{
+        const find = await UserModel.find({email:email})
+
+        if(find[0] !== undefined){
+            res.status(200).send(find)
+        }else{
+            res.status(201).send("User Didn't Exist")
+        }
     }
 
 }
@@ -143,4 +173,4 @@ const VerifyToken = (req,res) => {
     }
 
 
-module.exports = {Register, login , usercompleatedprofile , VerifyToken , changeprofilepic}
+module.exports = {Register, login , usercompleatedprofile , VerifyToken , changeprofilepic , getuserinfo , gettopuser}

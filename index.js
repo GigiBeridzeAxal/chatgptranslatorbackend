@@ -7,6 +7,8 @@ dotenv.config()
 app.use(cors({
     origin:'*'
    }))
+   app.use(express.json({ limit: '250mb' }));  // For JSON requests (set limit to 10MB)
+app.use(express.urlencoded({ limit: '250mb', extended: true }));  // For form submissions
 app.use(express.json())
 ConnectDB()
 

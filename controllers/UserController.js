@@ -14,7 +14,8 @@ const Register = async(req,res) => {
 
      const finduserbyemail = await UserModel.find({email:email})
 
-     console.log(finduserbyemail[0])
+
+
 
      if(finduserbyemail[0] == undefined){
 
@@ -73,7 +74,7 @@ const usercompleatedprofile = async(req,res) => {
         res.status(203).send("All Fields Are Required")
     }else{
 
-        const finduser = await UserModel.find({email:email})  
+        const finduser = await UserModel.findOne({email:email} , "compleatedprofile")  
 
         if(finduser[0] !== undefined){
             if(finduser[0].compleatedprofile == false){

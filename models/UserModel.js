@@ -36,6 +36,11 @@ const UserSchema = mongoose.Schema({
         required:true,
         default:'no'
     },
+    lastonline:{
+        type:Number,
+        required:true,
+        default:Date.now()
+    },
     
 
 

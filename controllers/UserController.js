@@ -175,4 +175,28 @@ const VerifyToken = (req,res) => {
     }
 
 
-module.exports = {Register, login , usercompleatedprofile , VerifyToken , changeprofilepic , getuserinfo , gettopuser}
+    const checkuserlastonline = async(req,res) => {
+        const {email} = req.body
+
+        const find = await UserModel.find({} , 'lastonline email')
+
+
+        res.status(200).send(find)
+
+       
+
+
+    }
+    const renewtime = async(req,res) => {
+        const {email} = req.body
+
+
+        const renew = await UserModel.updateOne({email:email} , {$set:{lastonline:Date.now()}})
+
+        if(renew){
+            res.status(200).send("ok")
+        }
+    }
+
+
+module.exports = {Register, login , usercompleatedprofile , VerifyToken , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}

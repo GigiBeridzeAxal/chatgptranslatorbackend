@@ -76,8 +76,9 @@ const usercompleatedprofile = async(req,res) => {
 
         const finduser = await UserModel.findOne({email:email} , "compleatedprofile")  
 
-        if(finduser[0] !== undefined){
-            if(finduser[0].compleatedprofile == false){
+
+        if(finduser !== null){
+            if(finduser.compleatedprofile == false){
                 res.status(201).send("Not Completed")
             }else{
                 res.status(200).send("Completed")   

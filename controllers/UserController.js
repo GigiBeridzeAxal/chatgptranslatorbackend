@@ -45,14 +45,15 @@ const login = async(req,res) => {
     if(!email || !password){
         res.status(203).send("All Fields Are Required")
     }else{
-        const findifuserexist = await UserModel.find({email:email})
+        const findifuserexist = await UserModel.findOne({email:email} , "email firstname lastname password")
 
-        if(findifuserexist[0] !== undefined){
-            if(findifuserexist[0].password === password){
-                const email = findifuserexist[0].email
-                const firstname = findifuserexist[0].firstname
-                const lastname = findifuserexist[0].lastname
-                const token = jwt.sign({email , firstname , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
+        if(findifuserexist !== null){
+            if(findifuserexist.password === password){
+                const email = findifuserexist.email
+                const firstname = findifuserexist.firstname
+                const lastname = findifuserexist.lastname
+                const id = findifuserexist._id
+                const token = jwt.sign({email , firstname , lastname , id} , process.env.SECRETKEY , {expiresIn:'1d'})
                 res.status(200).send(token)
             }else{
                 res.status(204).send("Password Didnt Match")
@@ -91,6 +92,36 @@ const usercompleatedprofile = async(req,res) => {
 
 }
 
+const changecanspeak = async(req,res) => {
+
+    
+    const {canspeak , email} = req.body
+
+    const update = await UserModel.updateOne({email:email} , {$set:{canspeak:canspeak}})
+
+    if(update){
+        res.status(200).send("Ok")
+    }else{
+        res.status(201).send("Something Went Wrong")
+    }
+
+}
+
+const changewanttolearn = async(req,res) => {
+
+    
+    const {wanttolearn , email} = req.body
+
+    const update = await UserModel.updateOne({email:email} , {$set:{wanttolearn:wanttolearn}})
+
+    if(update){
+        res.status(200).send("Ok")
+    }else{
+        res.status(201).send("Something Went Wrong")
+    }
+
+}
+
 const gettopuser = async(req,res) => {
     
 
@@ -112,6 +143,7 @@ const getuserinfo =  async(req,res) => {
     }else{
         const find = await UserModel.find({email:email})
 
+
         if(find[0] !== undefined){
             res.status(200).send(find)
         }else{
@@ -129,10 +161,10 @@ const changeprofilepic = async(req , res) => {
         console.log("Image Not Defined")
     }else{
 
-        const finduserbyemail = await UserModel.find({email:email})
+        const finduserbyemail = await UserModel.findOne({email:email} , "compleatedprofile")
 
 
-        if(finduserbyemail[0] !== undefined){
+        if(finduserbyemail !== null){
             const updated = {
                 profilepicture:image,
                 compleatedprofile:true
@@ -198,5 +230,41 @@ const VerifyToken = (req,res) => {
         }
     }
 
+    const getusersbylanguage = async(req,res) => {
 
-module.exports = {Register, login , usercompleatedprofile , VerifyToken , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}
+
+        const getusers = await UserModel.find({} , "email lastonline profilepicture canspeak wanttolearn firstname lastname")
+
+
+        if(getusers){
+            res.status(200).send(getusers)
+        }else{
+            res.status(201).send("Something Went Wrong")
+        }
+
+
+        
+
+
+    }
+
+
+    const getprofilebyid = async() => {
+
+        const {id} = req.body
+
+        const getuserinfoer = await UserModel.find({_id:id})
+
+        if(getuserinfoer){
+            res.status(200).send(getuserinfoer)
+        }else{
+            res.status(404).send("User Not FOund")
+        }
+
+    }
+
+
+    
+
+
+module.exports = {Register, getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}

@@ -41,6 +41,14 @@ const UserSchema = mongoose.Schema({
         required:true,
         default:Date.now()
     },
+    canspeak:{
+        type:Array,
+        required:true,
+    },
+    wanttolearn:{
+        type:Array,
+        required:true,
+    },
     
 
 

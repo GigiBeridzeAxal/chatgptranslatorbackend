@@ -1,5 +1,6 @@
 const express = require('express')
-const { Register, login, VerifyToken, usercompleatedprofile, changeprofilepic, getuserinfo, gettopuser , checkuserlastonline , renewtime } = require('../controllers/UserController')
+const { Register, login, VerifyToken, usercompleatedprofile, changeprofilepic, getuserinfo, gettopuser , checkuserlastonline , renewtime, changecanspeak, getusersbylanguage, changewanttolearn, getprofilebyid } = require('../controllers/UserController')
+
 const router = express.Router()
 
 
@@ -13,5 +14,11 @@ router.post('/getuserinfo' , getuserinfo)
 router.post('/gettopuser' , gettopuser)
 router.post('/checkuserlastonline' , checkuserlastonline)
 router.post('/renewtime' , renewtime)
+router.post('/changecanspeak' , changecanspeak)
+router.post('/getusersbylanguage' , getusersbylanguage)
+router.post('/changewanttolearn' , changewanttolearn)
+router.post('/getprofilebyid' , getprofilebyid)
+
+
 
 module.exports = router

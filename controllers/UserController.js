@@ -56,7 +56,7 @@ const login = async(req,res) => {
                 const token = jwt.sign({email , firstname , lastname , id} , process.env.SECRETKEY , {expiresIn:'1d'})
                 res.status(200).send(token)
             }else{
-                res.status(204).send("Password Didnt Match")
+                res.status(201).send('Password didnt match')
             }
         }else{
             res.status(202).send("Email Didn't Exist")
@@ -141,7 +141,7 @@ const getuserinfo =  async(req,res) => {
     if(!email){
         res.status(203).send("Email Not Defined")
     }else{
-        const find = await UserModel.find({email:email})
+        const find = await UserModel.find({email:email}).sort({lastonline:-1})
 
 
         if(find[0] !== undefined){
@@ -233,7 +233,7 @@ const VerifyToken = (req,res) => {
     const getusersbylanguage = async(req,res) => {
 
 
-        const getusers = await UserModel.find({} , "email lastonline profilepicture canspeak wanttolearn firstname lastname")
+        const getusers = await UserModel.find({} , "email lastonline profilepicture canspeak wanttolearn firstname lastname").sort({lastonline:-1})
 
 
         if(getusers){

@@ -249,7 +249,7 @@ const VerifyToken = (req,res) => {
     }
 
 
-    const getprofilebyid = async() => {
+    const getprofilebyid = async(req,res) => {
 
         const {id} = req.body
 

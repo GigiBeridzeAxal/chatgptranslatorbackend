@@ -83,8 +83,8 @@ const GoogleAuth = () => {
 
 
     passport.use(new GoogleStrategy({
-        clientID: "169596845347-646dva1bju3uqr96989mh0na6f1j5au9.apps.googleusercontent.com",
-        clientSecret: "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",
+        clientID: process.env.GoogleId,
+        clientSecret: process.env.GoogleSecret,
         callbackURL: "http://localhost:4000/googlecallback"
     }, function(accessToken, refreshToken, profile, cb) {
         User.findOrCreate({ googleId: profile.id }, function (err, user) {

@@ -33,7 +33,7 @@ const UserModel = require('./models/UserModel');
 passport.use(new GoogleStrategy({
     clientID: process.env.GoogleId,
     clientSecret: process.env.GoogleSecret,
-    callbackURL: 'http://localhost:4000/auth/callback',
+    callbackURL: 'https://chatgptranslatorbackend.onrender.com/auth/callback',
   }, async (token, tokenSecret, profile, done) => {
     try {
       // Check if user already exists

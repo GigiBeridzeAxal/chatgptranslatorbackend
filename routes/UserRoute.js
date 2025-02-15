@@ -1,5 +1,6 @@
 const express = require('express')
-const { Register, login, VerifyToken, usercompleatedprofile, changeprofilepic, getuserinfo, gettopuser , checkuserlastonline , renewtime, changecanspeak, getusersbylanguage, changewanttolearn, getprofilebyid } = require('../controllers/UserController')
+const { Register, login, VerifyToken, usercompleatedprofile, changeprofilepic, getuserinfo, gettopuser , checkuserlastonline , renewtime, changecanspeak, getusersbylanguage, changewanttolearn, getprofilebyid, GoogleAuth, getgoogleauth } = require('../controllers/UserController')
+const passport = require('passport')
 
 const router = express.Router()
 
@@ -18,7 +19,18 @@ router.post('/changecanspeak' , changecanspeak)
 router.post('/getusersbylanguage' , getusersbylanguage)
 router.post('/changewanttolearn' , changewanttolearn)
 router.post('/getprofilebyid' , getprofilebyid)
+router.post('/GoogleAuth' , GoogleAuth)
 
+
+router.get('/auth/callback', 
+    passport.authenticate('google', { failureRedirect: '/' , session:false }),
+    (req, res) => {
+      // Instead of using sessions, manually return a JWT
+        res.redirect(`http://localhost:3000/login-success?token=${req.user.token}&`)
+    }
+  );
+
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 
 module.exports = router

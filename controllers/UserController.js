@@ -21,6 +21,8 @@ const Register = async(req,res) => {
 
         const createnewuser = await UserModel.create({email , firstname , lastname , password})
 
+        console.log(createnewuser)
+
         if(createnewuser){
             const token = await jwt.sign({firstname , email , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
             res.status(200).send(token)
@@ -65,6 +67,43 @@ const login = async(req,res) => {
     }
     
 
+}
+
+const getgoogleauth = () => {
+    const passport = require("passport");
+
+    passport.authenticate('google' , {scope:["profile" , "email"]})
+
+}
+
+const GoogleAuth = () => {
+    const passport = require("passport");
+    const GoogleStrategy = require("passport-google-oauth20").Strategy;
+    const FacebookStrategy = require("passport-facebook").Strategy;
+
+
+    passport.use(new GoogleStrategy({
+        clientID: "169596845347-646dva1bju3uqr96989mh0na6f1j5au9.apps.googleusercontent.com",
+        clientSecret: "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",
+        callbackURL: "http://localhost:4000/googlecallback"
+    }, function(accessToken, refreshToken, profile, cb) {
+        User.findOrCreate({ googleId: profile.id }, function (err, user) {
+          return cb(err, user);
+        });
+      }
+
+)
+  
+
+)
+
+
+
+
+}
+
+const googlecallback = (req,res) => {
+    console.log(req)
 }
 
 const usercompleatedprofile = async(req,res) => {
@@ -267,4 +306,4 @@ const VerifyToken = (req,res) => {
     
 
 
-module.exports = {Register, getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}
+module.exports = {Register, getgoogleauth , googlecallback, GoogleAuth , getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}

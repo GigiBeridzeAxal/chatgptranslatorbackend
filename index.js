@@ -1,5 +1,5 @@
 const express = require('express')
-const app = express()
+
 const dotenv = require('dotenv')
 const cors = require('cors')
 const ConnectDB = require('./modules/ConnectDB')
@@ -7,13 +7,13 @@ const http = require('http')
 const socketio = require('socket.io')
 const jwt = require('jsonwebtoken')
 const ChattingModel = require('./models/ChattingModel')
+const { io, app , server} = require('./socket')
+const passport = require('passport')
 
-const server =  http.createServer(app)
 
-const io = socketio(server , {cors:{
-    origin:"*"
-}})
+
 dotenv.config()
+app.use(passport.initialize())
 app.use(cors({
     origin:'*'
    }))
@@ -25,78 +25,42 @@ ConnectDB()
 app.use('/' , require('./routes/UserRoute'))
 app.use('/' , require('./routes/Chattingrouter'))
 
-const users = {}
-
-io.on('connection' , (stream) => {
-
-    console.log(stream.id , "User Connected" , stream.handshake.query.userid)
-
-    if(stream.handshake.query.userid !== undefined){
-        users[stream.id] = stream.handshake.query.userid
-
-    }
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const UserModel = require('./models/UserModel');
 
 
 
-    stream.on("newmessage" , (data) => {
+passport.use(new GoogleStrategy({
+    clientID: "169596845347-646dva1bju3uqr96989mh0na6f1j5au9.apps.googleusercontent.com",
+    clientSecret: "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",
+    callbackURL: 'http://localhost:4000/auth/callback',
+  }, async (token, tokenSecret, profile, done) => {
+    try {
+      // Check if user already exists
+
+       let user = await UserModel.findOne({ email: profile.emails[0].value });
 
 
-
-        const userbyid = generatespeicifuserid(data.data.sendto)
-
-         console.log( data.data)
-
-         if(userbyid){
-            io.to(userbyid).emit('addednewmessages' , data)
-         }
-         const allmessage = data.data
-         const savemessage = ChattingModel.create({sendto:allmessage.sendto , sendby:allmessage.sendby , sendtime:Date.now() , message:allmessage.message})
-
-         
-         stream.emit('addednewmessages' ,data)
-
-
-    })
-
-    const generatespeicifuserid = (userid) => {
-
-        for(const user in users){
-
-            if(users[user] == userid){
-                return user
-            }
-        }
-        return null
-
-    }
-
-    
-
-    
-
-       stream.emit("onlineusers" , {users:Object.values(users)})
-
-    stream.on("Getonlineusers" , () => {
-
-        console.log(users)
-        stream.emit("onlineusers" , {users:Object.values(users)})
-        
-    })
-
-
-
-    stream.on("disconnect" , () => {
-        console.log("USer Disconected" , (stream.id))
-        delete users[stream.id]
-        io.emit("disc" , {users:Object.values(users)})
-       
-
-    })
-
-
+       const email = profile.emails[0].value
+       const lastname = profile.name.familyName
+       const firstname =  profile.name.givenName
+       const password = profile.id
+       if (!user) {
+         user = new UserModel({
+            email , firstname , lastname , password
+         });
+         await user.save();
+       }
+   
   
-
-})
+      // Create JWT token
+                const token = jwt.sign({email , firstname , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
+      
+      return done(null, { user, token: token });
+    } catch (error) {
+      return done(error, false);
+    }
+  }));
 
 
 

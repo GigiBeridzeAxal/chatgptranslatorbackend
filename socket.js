@@ -15,7 +15,7 @@ io.on('connection' , (stream) => {
 
     stream.on('disconnect', (User) => {
 
-        console.log("User Disconected" , User)
+        console.log("User Disconected" , stream.id)
         
 
     })

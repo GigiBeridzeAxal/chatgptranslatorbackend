@@ -10,12 +10,13 @@ const io = new socket.Server(server , {
 
 io.on('connection' , (stream) => {
 
-    console.log(stream , "User Connected")
+    console.log(stream.id , "User Connected")
 
 
     stream.on('disconnect', (User) => {
 
         console.log("User Disconected" , User)
+        
 
     })
 

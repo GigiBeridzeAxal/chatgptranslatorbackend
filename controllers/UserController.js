@@ -85,7 +85,7 @@ const GoogleAuth = () => {
     passport.use(new GoogleStrategy({
         clientID: process.env.GoogleId,
         clientSecret: process.env.GoogleSecret,
-        callbackURL: "https://chatgptranslatorbackend.onrender.com/googlecallback"
+        callbackURL: "http://localhost:4000/googlecallback"
     }, function(accessToken, refreshToken, profile, cb) {
         User.findOrCreate({ googleId: profile.id }, function (err, user) {
           return cb(err, user);
@@ -272,7 +272,7 @@ const VerifyToken = (req,res) => {
     const getusersbylanguage = async(req,res) => {
 
 
-        const getusers = await UserModel.find({} , "email lastonline profilepicture canspeak wanttolearn firstname lastname").sort({lastonline:-1})
+        const getusers = await UserModel.find({compleatedprofile:true} , "email lastonline profilepicture canspeak wanttolearn firstname lastname").sort({lastonline:-1})
 
 
         if(getusers){

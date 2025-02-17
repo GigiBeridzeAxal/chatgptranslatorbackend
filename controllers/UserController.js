@@ -1,5 +1,8 @@
+const multer = require('multer')
 const UserModel = require('../models/UserModel')
 const jwt = require('jsonwebtoken')
+const multerS3 = require('multer-s3');
+const s3 = require('../services/AWS');
 
 
 
@@ -192,13 +195,38 @@ const getuserinfo =  async(req,res) => {
 
 }
 
-const changeprofilepic = async(req , res) => {
+const upload = multer({
+    storage:multerS3({
+        s3:s3,
+        bucket:process.env.bucketname,
+        acl:'public-read',
+        metadata:(req,file,cb) => {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key: (req, file, cb) => {
+            // Set unique file name
+            cb(null, Date.now().toString() + path.extname(file.originalname));
+          },
+    })
+})
+
+const changeprofilepic = (upload.single('image') , async(req,res) => {
+    console.log(req.image)
+
+    if (!req.file) {
+        return res.status(400).send({ message: 'No file uploaded' });
+      }
+    
+
+
 
     const {image , email} = req.body
 
     if(!image || !email){
         console.log("Image Not Defined")
     }else{
+
+      
 
         const finduserbyemail = await UserModel.findOne({email:email} , "compleatedprofile")
 
@@ -222,7 +250,7 @@ const changeprofilepic = async(req , res) => {
     }
 
 }
-
+) 
 const VerifyToken = (req,res) => {
     const {token} = req.body
       
@@ -231,7 +259,7 @@ const VerifyToken = (req,res) => {
 
         try{
             jwt.verify(token , process.env.SECRETKEY)
-         res.status(200).send("Token Is Valid")
+         res.status(200).send(token)
        }catch(err){
         console.log(err)
           res.status(201).send("Token Is Not Valid")

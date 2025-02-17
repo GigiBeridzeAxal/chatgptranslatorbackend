@@ -1,8 +1,14 @@
 const express = require('express')
 const { Register, login, VerifyToken, usercompleatedprofile, changeprofilepic, getuserinfo, gettopuser , checkuserlastonline , renewtime, changecanspeak, getusersbylanguage, changewanttolearn, getprofilebyid, GoogleAuth, getgoogleauth } = require('../controllers/UserController')
 const passport = require('passport')
+const multerS3 = require('multer-s3');
+const s3 = require('../services/AWS');
+const path = require('path')
 
+const multer = require('multer');
+const UserModel = require('../models/UserModel');
 const router = express.Router()
+
 
 
 
@@ -10,7 +16,7 @@ router.post('/register' , Register)
 router.post('/login' , login)
 router.post('/Verify' , VerifyToken)
 router.post('/usercompleatedprofile' , usercompleatedprofile)
-router.post('/changeprofilepic' , changeprofilepic)
+
 router.post('/getuserinfo' , getuserinfo)
 router.post('/gettopuser' , gettopuser)
 router.post('/checkuserlastonline' , checkuserlastonline)
@@ -32,5 +38,47 @@ router.get('/auth/callback',
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+
+const storage = multer.memoryStorage()
+const upload = multer({storage})
+
+router.post('/changeprofilepic' , upload.single('image') , async(req,res) => {
+  console.log(req.file)
+
+  const params = {
+    Bucket:process.env.bucketname,
+    Key:`${Date.now()}_${req.file.originalname}`,
+    Body: req.file.buffer,
+    ContentType:req.file.mimetype
+  }
+
+  const data = await s3.upload(params).promise()
+
+
+
+  if(data){
+
+        const finduserbyemail = await UserModel.findOne({email:req.body.email} , "compleatedprofile")
+
+
+        if(finduserbyemail !== null){
+            const updated = {
+                profilepicture:data.Location,
+                compleatedprofile:true
+
+            }
+          const update = await UserModel.updateOne({email:req.body.email} , {$set:updated})
+
+          res.status(200).send("Ok")
+
+
+        }
+
+
+
+  }
+
+}
+) 
 
 module.exports = router

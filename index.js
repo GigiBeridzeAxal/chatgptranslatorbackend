@@ -54,7 +54,7 @@ passport.use(new GoogleStrategy({
    
   
       // Create JWT token
-                const token = jwt.sign({email , firstname , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
+                const token = jwt.sign({email , firstname , lastname , id:user._id} , process.env.SECRETKEY , {expiresIn:'1d'})
       
       return done(null, { user, token: token });
     } catch (error) {

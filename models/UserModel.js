@@ -36,6 +36,11 @@ const UserSchema = mongoose.Schema({
         required:true,
         default:'no'
     },
+    plan:{
+        type:String,
+        required:true,
+        default:'Free'
+    },
     lastonline:{
         type:Number,
         required:true,

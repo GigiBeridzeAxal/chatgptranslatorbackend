@@ -24,7 +24,7 @@ const Register = async(req,res) => {
 
         const createnewuser = await UserModel.create({email , firstname , lastname , password})
 
-        console.log(createnewuser)
+
 
         if(createnewuser){
             const token = await jwt.sign({firstname , email , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
@@ -106,7 +106,7 @@ const GoogleAuth = () => {
 }
 
 const googlecallback = (req,res) => {
-    console.log(req)
+
 }
 
 const usercompleatedprofile = async(req,res) => {
@@ -211,7 +211,7 @@ const upload = multer({
 })
 
 const changeprofilepic = (upload.single('image') , async(req,res) => {
-    console.log(req.image)
+
 
     if (!req.file) {
         return res.status(400).send({ message: 'No file uploaded' });
@@ -223,7 +223,7 @@ const changeprofilepic = (upload.single('image') , async(req,res) => {
     const {image , email} = req.body
 
     if(!image || !email){
-        console.log("Image Not Defined")
+
     }else{
 
       
@@ -300,7 +300,7 @@ const VerifyToken = (req,res) => {
     const getusersbylanguage = async(req,res) => {
 
 
-        const getusers = await UserModel.find({compleatedprofile:true} , "email lastonline profilepicture canspeak wanttolearn firstname lastname").sort({lastonline:-1})
+        const getusers = await UserModel.find({compleatedprofile:true}).sort({lastonline:-1}).select("-password")
 
 
         if(getusers){

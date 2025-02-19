@@ -3,6 +3,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const ConnectDB = require('./modules/ConnectDB')
+const UserModel = require('./models/UserModel');
 const http = require('http')
 const socketio = require('socket.io')
 const jwt = require('jsonwebtoken')
@@ -24,16 +25,21 @@ ConnectDB()
 
 app.use('/' , require('./routes/UserRoute'))
 app.use('/' , require('./routes/Chattingrouter'))
+app.use('/' , require('./routes/OpenAiRoutes'))
 
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const UserModel = require('./models/UserModel');
+
+
+
+
+
 
 
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GoogleId,
     clientSecret: process.env.GoogleSecret,
-    callbackURL: 'http://localhost:4000/auth/callback',
+    callbackURL: `http://localhost:4000/auth/callback`,
   }, async (token, tokenSecret, profile, done) => {
     try {
       // Check if user already exists

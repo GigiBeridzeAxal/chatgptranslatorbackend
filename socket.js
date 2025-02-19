@@ -22,7 +22,7 @@ export function CheckUserId(userid) {
 
 io.on('connection' , (stream) => {
 
-    console.log(stream.id , "User Connected")
+
     const userid = stream.handshake.query.userID
 
     users[userid] = stream.id
@@ -36,7 +36,7 @@ io.on('connection' , (stream) => {
 
     stream.on('disconnect', (User) => {
 
-        console.log("User Disconected" , userid)
+
 
         delete users[userid]
         

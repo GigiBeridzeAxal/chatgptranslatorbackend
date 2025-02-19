@@ -13,7 +13,7 @@ const getuserfromquery = async(req,res) => {
     if(getuserbyid[0] !== undefined){
         res.status(200).send(getuserbyid)
     }else{
-        console.log(getuserbyid[0])
+
         res.status(404).send("Not Found")
     }
 
@@ -29,7 +29,6 @@ const getmessages = async(req,res) => {
     const findmessages = await ChattingModel.find({$or:[
         {sendto:userid},
         {sendby:userid},
-
     ]})
 
     if(findmessages){
@@ -45,46 +44,48 @@ const userswhosentmessage = async(req,res) => {
 
     const {queryuser , Authuser} = req.body
 
-    console.log(Authuser , queryuser)
+
+
+    
 
 
 
 
         const getallmsesagessend = await ChattingModel.find({$or:[
-            {sendby:queryuser ?  queryuser._id : Authuser.id},
-            {sendto:queryuser ?  queryuser._id : Authuser.id},
             {sendby: Authuser.id},
             {sendto: Authuser.id},
-        ]})
-        console.log(getallmsesagessend)
+        ]}).sort({sendtime:-1})
 
 
-        const send = getallmsesagessend.map(msg => msg.sendby || msg.sendto).map(item => ({ item })).filter((value , index ,self) => index === self.findIndex((t) => (
-            t.item === value.item
-        )))
+
+
+     
+       
+ 
+    
 
 
       
-        const users = send.map(data => data.item).filter(filt => {
-            return queryuser ?
-            filt !== queryuser._id
-            : 
-            filt !== Authuser.id
-        }).filter(filts => filts !== Authuser.id) 
+        const users = getallmsesagessend.filter(data => data.sendby === Authuser.id || data.sendto === Authuser.id )
+        const list = [
+            ...users.map(data => data.sendby),
+            ...users.map(data => data.sendto),
+            queryuser ? String(queryuser) : null
 
-        console.log(send)
+        ].filter(data => data !== Authuser.id)
+
+        
 
 
-
-
-        const getusers = await UserModel.find( {_id: {$in:users}} ).select('-password')
-
+       const getusers = await UserModel.find( {_id: {$in:list}} ).select('-password')
 
 
 
-        if(getusers !== undefined){
-            res.status(200).send(getusers)
-        }
+
+
+       if(getusers !== undefined){
+         res.status(200).send(getusers)
+     }
 
       
 

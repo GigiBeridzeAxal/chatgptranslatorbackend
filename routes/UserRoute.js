@@ -33,7 +33,7 @@ router.get('/auth/callback',
     passport.authenticate('google', { failureRedirect: '/' , session:false }),
     (req, res) => {
       // Instead of using sessions, manually return a JWT
-        res.redirect(`http://localhost:3000/login-success?token=${req.user.token}&`)
+        res.redirect(`${process.env.frontend}login-success?token=${req.user.token}&`)
     }
   );
 

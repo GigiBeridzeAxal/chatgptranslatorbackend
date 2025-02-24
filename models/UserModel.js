@@ -37,9 +37,15 @@ const UserSchema = mongoose.Schema({
         default:'no'
     },
     plan:{
-        type:String,
+        type:Array,
         required:true,
-        default:'Free'
+        default:[
+            {
+                plan:"Free",
+                activationtime:Date.now()
+                
+            }
+        ]
     },
     lastonline:{
         type:Number,

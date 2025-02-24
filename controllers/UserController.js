@@ -3,6 +3,7 @@ const UserModel = require('../models/UserModel')
 const jwt = require('jsonwebtoken')
 const multerS3 = require('multer-s3');
 const s3 = require('../services/AWS');
+const { OpenAiSuggested } = require('../services/OpenAi');
 
 
 
@@ -27,7 +28,8 @@ const Register = async(req,res) => {
 
 
         if(createnewuser){
-            const token = await jwt.sign({firstname , email , lastname} , process.env.SECRETKEY , {expiresIn:'1d'})
+            const id = createnewuser._id
+            const token = await jwt.sign({firstname , email , lastname , id} , process.env.SECRETKEY , {expiresIn:'1d'})
             res.status(200).send(token)
         }else{
             res.status(201).send("Something Went Wrong Please Try Again")
@@ -274,6 +276,7 @@ const VerifyToken = (req,res) => {
     }
 
 
+
     const checkuserlastonline = async(req,res) => {
         const {email} = req.body
 
@@ -299,12 +302,85 @@ const VerifyToken = (req,res) => {
 
     const getusersbylanguage = async(req,res) => {
 
+        const {userid} = req.body
+
+        console.log(userid, 'this is uerid')
+
 
         const getusers = await UserModel.find({compleatedprofile:true}).sort({lastonline:-1}).select("-password")
 
+        const mainuser = getusers.filter(filt => filt._id == userid)
+       // getusers.filter(data => console.log(data._id))
+      const maincanspeak = mainuser[0].canspeak.map(data => data.selectedlanguage)
+      const mainwanttolearn = mainuser[0].wanttolearn.map(data => data.selectedlanguage)
+
+      const sorted = mainuser
+
+
+     
+
+    const bestmatches = (arr) => {
+        
+        for(let i = 0; i < arr.length; i++) {
+
+        let matches = 0
+
+        const canspeak =  getusers[i].canspeak.map(data => data.selectedlanguage)
+        const wanttolearn = getusers[i].wanttolearn.map(data => data.selectedlanguage)
+
+        for (let j = 0; j < canspeak.length; j++) {
+
+
+
+            if(mainwanttolearn.includes(canspeak[j])){
+             matches++
+            }
+            
+   
+         }
+
+        for (let j = 0; j < wanttolearn.length; j++) {
+
+
+
+           if(maincanspeak.includes(wanttolearn[j])){
+            matches++
+           }
+           
+  
+        }
+
+
+        arr[i] = {...arr[i] , matches}
+
+   
+
+   
+        
+      }
+
+      return arr
+
+    
+    } 
+
+
+ 
+    
+
+
+      const alluser = [
+        ...getusers
+      ]
+      const sortedforuser = bestmatches(alluser)
+      const BestUsers = sortedforuser.sort((a,b) => b.matches - a.matches)
+
+
+
 
         if(getusers){
-            res.status(200).send(getusers)
+            
+            res.status(200).send({getusers , BestUsers})
         }else{
             res.status(201).send("Something Went Wrong")
         }
@@ -331,7 +407,48 @@ const VerifyToken = (req,res) => {
     }
 
 
+    const planend = async(req,res) => {
+
+        const {userid} = req.body
+        try{
+
+            console.log(userid)
+
+
+            const update = await UserModel.updateOne({_id:userid} , {$set:{plan:[
+                {plan:"Free" , activationtime:Date.now()}
+            ]}})
+            res.status(200).send("Succesfuly End")
+        }catch(err){
+            console.log(err)
+        }
+ 
+
+        
+
+
+    }
+
+
+    const PlanPurcashe = async(req,res) => {
+
+        const {userid , plan} = req.body
+        console.log(userid , plan)
+
+        const update = await UserModel.updateOne({_id:userid} , {$set:{plan:[
+            {plan:plan.toString() , activationtime:Date.now()}
+        ]}})
+        
+
+
+        if(update){
+            console.log("Working")
+
+            res.status(200).send("Ok")
+        }
+
+    }
     
 
 
-module.exports = {Register, getgoogleauth , googlecallback, GoogleAuth , getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}
+module.exports = {Register,PlanPurcashe , planend , getgoogleauth , googlecallback, GoogleAuth , getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}

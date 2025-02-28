@@ -60,6 +60,19 @@ const UserSchema = mongoose.Schema({
         type:Array,
         required:true,
     },
+    aboutme:{
+        type:String,
+
+        default:''
+    },
+    liketotalk:{
+        type:String,
+   
+        default:''
+    },
+    
+    
+
     
 
 

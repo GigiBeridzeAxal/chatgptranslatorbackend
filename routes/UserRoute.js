@@ -1,5 +1,5 @@
 const express = require('express')
-const { Register, login, VerifyToken, usercompleatedprofile, changeprofilepic, getuserinfo, gettopuser , checkuserlastonline , renewtime, changecanspeak, getusersbylanguage, changewanttolearn, getprofilebyid, GoogleAuth, getgoogleauth, PlanPurcashe, planend } = require('../controllers/UserController')
+const { Register, login, VerifyToken, usercompleatedprofile, changeprofilepic, getuserinfo, gettopuser , checkuserlastonline , renewtime, changecanspeak, getusersbylanguage, changewanttolearn, getprofilebyid, GoogleAuth, getgoogleauth, PlanPurcashe, planend, changeabout, liketotalk, buyitem } = require('../controllers/UserController')
 const passport = require('passport')
 const multerS3 = require('multer-s3');
 const s3 = require('../services/AWS');
@@ -28,6 +28,13 @@ router.post('/getprofilebyid' , getprofilebyid)
 router.post('/GoogleAuth' , GoogleAuth)
 router.post('/PlanPurcashe' , PlanPurcashe)
 router.post('/planend' , planend)
+router.post('/changeabout' , changeabout)
+router.post('/liketotalk' , liketotalk)
+router.post('/buyitem' , buyitem)
+
+
+
+
 
 router.get('/auth/callback', 
     passport.authenticate('google', { failureRedirect: '/' , session:false }),

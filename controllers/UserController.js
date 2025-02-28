@@ -434,8 +434,9 @@ const VerifyToken = (req,res) => {
 
         const {userid , plan} = req.body
         console.log(userid , plan)
+        const usercredits = await UserModel.findOne({_id:userid})
 
-        const update = await UserModel.updateOne({_id:userid} , {$set:{plan:[
+        const update = await UserModel.updateOne({_id:userid} , {$set:{credits:usercredits.credits + 1500 ,plan:[
             {plan:plan.toString() , activationtime:Date.now()}
         ]}})
         
@@ -448,7 +449,76 @@ const VerifyToken = (req,res) => {
         }
 
     }
+
+    const changeabout = async(req,res) => {
+        
+        const {email , about} = req.body
+
+       try{
+        const update = await UserModel.updateOne({email:email}  , {$set:{aboutme:about}})
+        res.status(200).send('ok')
+
+
+       }catch(err){
+        res.status(400).send('ok')
+       }
+
+
+    }
+    const liketotalk = async(req,res) => {
+        
+        const {email , liketotalk} = req.body
+
+       try{
+        const update = await UserModel.updateOne({email:email}  , {$set:{liketotalk:liketotalk}})
+        res.status(200).send('ok')
+
+
+       }catch(err){
+        res.status(400).send('ok')
+       }
+
+
+    }
     
+    const buyitem = async(req,res) => {
 
 
-module.exports = {Register,PlanPurcashe , planend , getgoogleauth , googlecallback, GoogleAuth , getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}
+        const {item , email} = req.body
+        try{
+
+
+            const updatecredits = async(creditvalue) => {
+
+                const user = await UserModel.findOne({email:email})
+                const credit = user.credits - creditvalue
+
+                const update =await UserModel.updateOne({email:email} ,  {$set:{credits:credit}})
+
+                
+
+                res.json(credit)
+
+            }
+
+
+            switch (item) {
+                case 'Translate':
+
+                updatecredits(3)
+
+                    break;
+            
+                default:
+                    break;
+            }
+
+
+        }catch(err){
+            res.status(400).send(err)
+        }
+
+    }
+
+
+module.exports = {Register,PlanPurcashe , buyitem, liketotalk ,changeabout, planend , getgoogleauth , googlecallback, GoogleAuth , getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}

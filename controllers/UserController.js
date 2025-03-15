@@ -91,7 +91,7 @@ const GoogleAuth = () => {
     passport.use(new GoogleStrategy({
         clientID: process.env.GoogleId,
         clientSecret: process.env.GoogleSecret,
-        callbackURL: `${process.env.backend}/googlecallback`
+        callbackURL: `https://chatgptranslatorbackend.onrender.com/googlecallback`
     }, function(accessToken, refreshToken, profile, cb) {
         User.findOrCreate({ googleId: profile.id }, function (err, user) {
           return cb(err, user);

@@ -49,7 +49,7 @@ router.get('/auth/callback',
     }
   );
 
- router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+  router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 
 const storage = multer.memoryStorage()

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const multerS3 = require('multer-s3');
 const s3 = require('../services/AWS');
 const { OpenAiSuggested } = require('../services/OpenAi');
-const { default: axios } = require('axios');
+
 
 
 

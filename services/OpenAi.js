@@ -66,4 +66,34 @@ return completion.then((result) =>  result.choices[0].message)
 }
 
 
-module.exports = {OpenAimod , OpenAiSuggested}
+const Audiotranslator = async(audio) => {
+
+  console.log(audio)
+
+  const formData = new FormData();
+
+  // Convert the audio blob into a File (adjust the file name and type as necessary)
+  const audioFile = new File([audio.file], "audio.wav", { type: "audio/wav" });
+  formData.append("file", audioFile);
+
+
+  const completion = await openai.chat.completions.create({
+  model: "whisper-1",
+    store: true,
+  messages: [
+      {"role": "user", "content": formData},
+    ],
+  });
+
+
+  console.log(completion)
+
+
+
+
+
+
+}
+
+
+module.exports = {OpenAimod , Audiotranslator ,OpenAiSuggested}

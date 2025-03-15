@@ -102,6 +102,10 @@ const sendprivatemssage = async(req,res) => {
     const {param} = req.body
 
 
+    console.log(param)
+
+
+
 
     
     const streamidtosend = CheckUserId(param.sendto)

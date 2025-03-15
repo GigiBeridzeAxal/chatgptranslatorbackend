@@ -1,4 +1,5 @@
-const {OpenAimod} = require('../services/OpenAi')
+const formidable = require('formidable')
+const {OpenAimod, Audiotranslator} = require('../services/OpenAi')
 
 
 
@@ -10,4 +11,31 @@ const translatetext = async(req,res) => {
 
 }
 
-module.exports = {translatetext}
+
+const translateauido = async(req,res) => {
+
+    const form = new formidable.IncomingForm();
+
+
+    form.parse(req , async(err , fields , files) => {  
+
+
+        try{
+
+            const response = await Audiotranslator(fields)
+
+
+        }catch(err){
+            console.log(err)
+        }
+
+
+        
+    })
+
+
+
+    
+}
+
+module.exports = {translatetext , translateauido}

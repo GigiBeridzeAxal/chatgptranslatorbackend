@@ -19,6 +19,12 @@ const ChatSchema = mongoose.Schema({
         type:Number,
         required:true
     },
+    format:{
+        type:String,
+        default:'text'
+      
+    },
+    
 
 })
 

@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const multerS3 = require('multer-s3');
 const s3 = require('../services/AWS');
 const { OpenAiSuggested } = require('../services/OpenAi');
+const { default: axios } = require('axios');
 
 
 
@@ -197,6 +198,8 @@ const getuserinfo =  async(req,res) => {
 
 }
 
+
+
 const upload = multer({
     storage:multerS3({
         s3:s3,
@@ -214,6 +217,8 @@ const upload = multer({
 
 const changeprofilepic = (upload.single('image') , async(req,res) => {
 
+    console.log("hello world")
+
 
     if (!req.file) {
         return res.status(400).send({ message: 'No file uploaded' });
@@ -225,15 +230,37 @@ const changeprofilepic = (upload.single('image') , async(req,res) => {
     const {image , email} = req.body
 
     if(!image || !email){
+      console.log("Formdata cant find")
 
     }else{
 
       
 
+        console.log(correct)
+
+        if(finduserbyemail.profilepicture){
+            
         const finduserbyemail = await UserModel.findOne({email:email} , "compleatedprofile")
+        const imagePath = finduserbyemail.profilepicture.replace("https://bucketforchatgpttranslatorappimages.s3.eu-north-1.amazonaws.com/", "");
+      
+            const params = {
+                Bucket:process.env.bucketname,
+                Key:imagePath
+            }
+
+            s3.deleteObject(params , (err,data) => {
+                if(err){
+                    res.status(205).send("Ok")
+                }else{
+                    console.log("Image Deleted Succesfuly" , data)
+                }
+            })
+
+        }
 
 
         if(finduserbyemail !== null){
+            console.log("Updating")
             const updated = {
                 profilepicture:image,
                 compleatedprofile:true
@@ -253,6 +280,106 @@ const changeprofilepic = (upload.single('image') , async(req,res) => {
 
 }
 ) 
+
+
+const updateaboutme = async(req,res) => {
+
+   const {email , aboutme} = req.body
+
+
+   if(!email , !aboutme){
+    res.status(404).send("Not Found")
+   }else{
+
+  
+
+    const update = await UserModel.updateOne({email:email} , {$set:{aboutme:aboutme}})
+
+    if(update){
+        res.status(200).send("Ok")
+    }
+
+
+
+
+   }
+
+
+}
+
+
+const updatecanteachyou = async(req,res) => {
+    const {email , canteachyou} = req.body
+
+     
+    if(!email , !canteachyou){
+        res.status(404).send("Not Found")
+        console.log("wdawdawd")
+       }else{
+
+
+ 
+     const update = await UserModel.updateOne({email:email} , {$set:{canspeak:canteachyou}})
+
+     if(update){
+        res.status(200).send("Ok")
+    }
+
+       }
+
+    
+
+}
+
+const updatewanttolearn = async(req,res) => {
+    const {email , wanttolearn} = req.body
+
+     
+    if(!email , !wanttolearn){
+        res.status(404).send("Not Found")
+        console.log("wdawdawd")
+       }else{
+
+
+ 
+     const update = await UserModel.updateOne({email:email} , {$set:{wanttolearn:wanttolearn}})
+
+     if(update){
+        res.status(200).send("Ok")
+    }
+
+       }
+
+    
+
+}
+
+const updateliketotalk = async(req,res) => {
+
+    const {email , liketotalk} = req.body
+ 
+ 
+    if(!email , !liketotalk){
+     res.status(404).send("Not Found")
+     console.log("wdawdawd")
+    }else{
+ 
+   
+ 
+     const update = await UserModel.updateOne({email:email} , {$set:{liketotalk:liketotalk}})
+ 
+     if(update){
+         res.status(200).send("Ok")
+     }
+ 
+ 
+ 
+ 
+    }
+ 
+ 
+ }
+
 const VerifyToken = (req,res) => {
     const {token} = req.body
       
@@ -521,4 +648,4 @@ const VerifyToken = (req,res) => {
     }
 
 
-module.exports = {Register,PlanPurcashe , buyitem, liketotalk ,changeabout, planend , getgoogleauth , googlecallback, GoogleAuth , getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}
+module.exports = {Register,PlanPurcashe , updatecanteachyou, updatewanttolearn ,updateliketotalk , updateaboutme, buyitem, liketotalk ,changeabout, planend , getgoogleauth , googlecallback, GoogleAuth , getprofilebyid, getusersbylanguage ,changewanttolearn , login , usercompleatedprofile , VerifyToken , changecanspeak , changeprofilepic , getuserinfo , gettopuser , checkuserlastonline , renewtime}
